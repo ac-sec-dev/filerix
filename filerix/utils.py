@@ -3,6 +3,7 @@ from typing import Union, Optional, Any
 import tempfile, ctypes, json 
 import stat, os, sys, re
 from pathlib import Path 
+import unicodedata
 
 def _sanitize_content(content: Any, *, compact: bool = False) -> str:
     """
@@ -37,7 +38,10 @@ def _sanitize_content(content: Any, *, compact: bool = False) -> str:
         raise TypeError(f'Tipo de conteúdo não suportado: {type(content)}')
 
     # Remover caracteres de controle invisíveis (exceto \t e \n)
-    content_str = re.sub(r'[^\x20-\x7E\t\n]', '', content_str)
+    content_str = ''.join(
+        ch for ch in content_str
+        if (ch == '\n' or ch == '\t' or not unicodedata.category(ch).startswith('C'))
+    )
 
     # Padronizar as quebras de linha 
     content_str = content_str.replace('\r\n', '\n').replace('\r', '\n')

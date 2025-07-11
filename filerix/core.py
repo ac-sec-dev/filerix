@@ -109,14 +109,18 @@ def delete_file(path: Union[str, Path], *, ignore_missing: bool = False) -> bool
     """
 
     try:
-        # Se não for ignorar inexistência, validar normalmente
-        file_path = _validate_path(path, must_exist = True, is_file = True)
-        file_path.unlink() 
-        return True 
-    except FileNotFoundError:
-        if ignore_missing:
-            return False 
-        raise FileNotFoundError(f'O arquivo não foi encontrado')
+        path = Path(path).expanduser().resolve(strict = False)
+        
+        # Verificação de existência antecipada se for ignorar 
+        if not path.exists():
+            if ignore_missing:
+                return False 
+            raise PathValidationError(str(path), 'O caminho não existe')
+        
+        # Agora sim passa pela validação 
+        _validate_path(path, must_exist = True, is_file = True)
+        path.unlink() 
+        return True
     except IsADirectoryError:
         raise PathValidationError(str(path), 'O caminho especificado é um diretório')
     except PermissionError:
