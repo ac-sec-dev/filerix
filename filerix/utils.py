@@ -52,7 +52,7 @@ def _sanitize_content(content: Any, *, compact: bool = False) -> str:
 
     return content_str
 
-def is_readonly(path: Union[str, Path]) -> bool:
+def _is_readonly(path: Union[str, Path]) -> bool:
     """
     Verifica se o caminho é somente leitura (sem permissão de escrita)
 
